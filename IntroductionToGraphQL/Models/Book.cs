@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace IntroductionToGraphQL.Models;
+﻿namespace IntroductionToGraphQL.Models;
 
 public sealed class Book
 {

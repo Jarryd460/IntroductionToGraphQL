@@ -1,5 +1,4 @@
 using IntroductionToGraphQL.Infrastructure;
-using IntroductionToGraphQL.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,11 +8,22 @@ builder.AddServiceDefaults();
 builder.Services.AddDbContext<BookContext>();
 
 builder.Services.AddGraphQLServer()
-    .AddQueryType<Query>()
-    .AddMutationType<Mutation>()
+    // Manually add types if you don't want to use the source generated extension method
+    // Only a single QueryType can be registered. It is the entrypoint
+    //.AddQueryType<BookQuery>()
+    //.AddType<BookType>()
+    // Only a single MutationType can be registered. It is the entrypoint
+    //.AddMutationType<Mutation>()
+    // Source generated extension method from HotChocolate.Types.Analyzers package
+    .AddIntroductionToGraphQLTypes()
     .AddFiltering()
     .AddSorting()
-    .AddProjections();
+    .AddProjections()
+    // Generates AddAuthorInput, AddAuthorPayload, UpdateAuthorInput, UpdateAuthorPayload, DeleteAuthorInput, DeleteAuthorPayload which is the recommeded pattern by HotChocolate for GraphQL
+    .AddMutationConventions()
+    // Wraps all mutations into a single transaction and if all succeeds it gets committed otherwise if any mutation fails then all are rolledback. SaveChangesAsync calls are wrapped internally
+    // so that changes are not committed immediately when called. This is done internally by AddDefaultTransactionScopeHandler.
+    .AddDefaultTransactionScopeHandler();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

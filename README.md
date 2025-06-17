@@ -22,19 +22,44 @@ dotnet run --project IntroductionToGraphQL.AppHost
 query firstquery {
   books(where: { title: { contains: "a" } }, order: { price: ASC }) {
     title,
-    author,
+    author {
+		id,
+		name
+	}
     price
   }
 }
 ```
 
 ```graphql
-mutation {
-    addBook(book: { id: 0, title: "GraphQL for .NET Developers", author: "Jane Doe", price: 29.99 }) {
-        id,
-        title,
-        author,
-        price
-    }
+query singleBook($id: ID!) {
+  book(id: $id) {
+		id,
+    title,
+    price,
+	authorId,
+	author {
+		id,
+		name
+	}
+  }
+}
+
+//variables
+{
+  "id": 1
 }
 ```
+
+```graphql
+mutation {
+	addAuthor(input: { author: { name: "John" }}) {
+		author {
+			id,
+			name
+		}
+	}
+}
+```
+
+More queries are available in the insomnia json file in the root directory. You will need to download insomnia and import the requests into insomnia to run the requests
