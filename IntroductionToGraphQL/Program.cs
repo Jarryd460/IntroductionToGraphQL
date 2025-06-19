@@ -1,4 +1,5 @@
 using IntroductionToGraphQL.Infrastructure;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +9,8 @@ builder.AddServiceDefaults();
 builder.Services.AddDbContext<BookContext>();
 
 builder.Services.AddGraphQLServer()
+    // Add connection to Redis for subscriptions. This is required for HotChocolate to work with Redis as a message broker for subscriptions (real-time communication of events/changes)
+    .AddRedisSubscriptions((sp) => ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("RedisConnection")))
     // Manually add types if you don't want to use the source generated extension method
     // Only a single QueryType can be registered. It is the entrypoint
     //.AddQueryType<BookQuery>()
@@ -55,6 +58,9 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseWebSockets();
+
 app.MapGraphQL();
 
 app.Run();

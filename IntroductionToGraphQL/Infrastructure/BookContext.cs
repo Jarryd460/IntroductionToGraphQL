@@ -20,7 +20,7 @@ public sealed class BookContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
-        var connectionString = _configuration.GetConnectionString("DefaultConnection")
+        var connectionString = _configuration.GetConnectionString("SqlConnection")
             ?? throw new InvalidOperationException("Database connection string is not set.");
         options.UseSqlServer(connectionString)
             // One should use migrations to seed data instead for large datasets. Migrations should be it's own project

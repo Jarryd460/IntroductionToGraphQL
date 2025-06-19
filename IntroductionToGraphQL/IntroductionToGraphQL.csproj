@@ -12,6 +12,7 @@
     <PackageReference Include="Bogus" Version="35.6.3" />
     <PackageReference Include="HotChocolate.AspNetCore" Version="15.1.5" />
     <PackageReference Include="HotChocolate.Data.EntityFramework" Version="15.1.5" />
+    <PackageReference Include="HotChocolate.Subscriptions.Redis" Version="15.1.6" />
     <PackageReference Include="HotChocolate.Types.Analyzers" Version="15.1.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.5" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1-Preview.1" />

@@ -1,5 +1,7 @@
-﻿using IntroductionToGraphQL.Infrastructure;
+﻿using HotChocolate.Subscriptions;
+using IntroductionToGraphQL.Infrastructure;
 using IntroductionToGraphQL.Models.Exceptions;
+using IntroductionToGraphQL.Models.Subscriptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace IntroductionToGraphQL.Models;
@@ -8,24 +10,25 @@ namespace IntroductionToGraphQL.Models;
 public sealed class BookMutation
 {
     [Error(typeof(BookWithTitleExistsException))]
-    public async Task<Book> AddBookAsync(Book book, [Service] BookContext context)
+    public async Task<Book> AddBookAsync(Book book, [Service] BookContext context, ITopicEventSender sender, CancellationToken cancellationToken)
     {
-        var booksWithSameTitle = await context.Books.AsNoTracking().Where(b => b.Title == book.Title).ToListAsync().ConfigureAwait(false);
+        var booksWithSameTitle = await context.Books.AsNoTracking().Where(b => b.Title == book.Title).ToListAsync(cancellationToken).ConfigureAwait(false);
 
         if (booksWithSameTitle.Any())
         {
             throw new BookWithTitleExistsException(book.Title);
         }
 
-        await context.Books.AddAsync(book).ConfigureAwait(false);
-        await context.SaveChangesAsync().ConfigureAwait(false);
+        await context.Books.AddAsync(book, cancellationToken).ConfigureAwait(false);
+        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await sender.SendAsync(nameof(BookSubscription.BookAdded), book, cancellationToken);
 
         return book;
     }
 
     [Error(typeof(BookNotFoundException))]
     [Error(typeof(BookWithTitleExistsException))]
-    public async Task<Book> UpdateBookAsync(int id, Book updatedBook, [Service] BookContext context, CancellationToken cancellationToken)
+    public async Task<Book> UpdateBookAsync(int id, Book updatedBook, [Service] BookContext context, ITopicEventSender sender, CancellationToken cancellationToken)
     {
         var book = await context.Books.FindAsync([id], cancellationToken).ConfigureAwait(false);
 
@@ -34,7 +37,7 @@ public sealed class BookMutation
             throw new BookNotFoundException(id);
         }
 
-        var booksWithSameTitle = await context.Books.AsNoTracking().Where(b => b.Id != book.Id && b.Title == book.Title).ToListAsync().ConfigureAwait(false);
+        var booksWithSameTitle = await context.Books.AsNoTracking().Where(b => b.Id != book.Id && b.Title == book.Title).ToListAsync(cancellationToken).ConfigureAwait(false);
 
         if (booksWithSameTitle.Any())
         {
@@ -43,10 +46,10 @@ public sealed class BookMutation
 
         book.Title = updatedBook.Title;
         book.Price = updatedBook.Price;
-        book.AuthorId = updatedBook.AuthorId;
-        book.Author = updatedBook.Author;        
+        book.AuthorId = updatedBook.AuthorId;     
 
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await sender.SendAsync(book.AuthorId.ToString(), book, cancellationToken);
 
         return book;
     }
