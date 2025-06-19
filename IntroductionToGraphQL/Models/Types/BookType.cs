@@ -18,6 +18,11 @@ internal sealed class BookType : ObjectType<Book>
         descriptor
             .Field(p => p.Id)
             .Type<NonNullType<IdType>>();
+
+        //HotChocolate has support for other Scalar Types that ensures better type safety
+        descriptor
+            .Field(b => b.EmailAddress)
+            .Type<EmailAddressType>();
     }
 
     private sealed class BookResolvers

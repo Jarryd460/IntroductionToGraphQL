@@ -42,7 +42,8 @@ public sealed class BookContext : DbContext
                     .UseSeed(100)
                     .RuleFor(b => b.Title, f => f.Lorem.Sentence(3))
                     .RuleFor(b => b.Author, f => f.PickRandom(authorsToSeed)) // Randomly pick an author from the seeded authors
-                    .RuleFor(b => b.Price, f => f.Finance.Amount(5, 100));
+                    .RuleFor(b => b.Price, f => f.Finance.Amount(5, 100))
+                    .RuleFor(b => b.EmailAddress, f => f.Person.Email);
 
                     var booksToSeed = fakeBooks.Generate(20);
 
