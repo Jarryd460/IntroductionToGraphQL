@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IntroductionToGraphQL.Models;
 
+[ObjectType]
 public sealed class Author
 {
     // Specify [GraphQLType(typeof(NonNullType<IdType>))] so that GraphQL uses type ID under the hood. See BookType for another way to do this for bigger projects

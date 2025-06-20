@@ -14,7 +14,7 @@ You need to run the Redis Stack container to enable the GraphQL subscriptions fe
 Ensure that the redis.conf file is UTF-8 encoded and does not contain a BOM (Byte Order Mark) and Line Endings are set to LF (Unix style).
 
 ```bash
-docker run -d --name redis-stack -e REDIS_ARGS="--appendonly yes --save 60 1 --dir /data" -p 6379:6379 -p 8001:8001 -v redis_data:/data -v $pwd/redis.conf:/redis-stack.conf redis/redis-stack:latest
+docker run -d --name redis-stack -p 6379:6379 -p 8001:8001 -v redis_data:/data -v $pwd/redis.conf:/redis-stack.conf redis/redis-stack:latest
 ```
 
 You can use environment variables instead of a redis.conf file

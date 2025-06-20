@@ -8,9 +8,15 @@ builder.AddServiceDefaults();
 // Add services to the container.
 builder.Services.AddDbContext<BookContext>();
 
+var redisConnectionString = builder.Configuration.GetConnectionString("RedisConnection");
+if (string.IsNullOrEmpty(redisConnectionString))
+{
+    throw new InvalidOperationException("Redis connection string is not configured.");
+}
+
 builder.Services.AddGraphQLServer()
     // Add connection to Redis for subscriptions. This is required for HotChocolate to work with Redis as a message broker for subscriptions (real-time communication of events/changes)
-    .AddRedisSubscriptions((sp) => ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("RedisConnection")))
+    .AddRedisSubscriptions((sp) => ConnectionMultiplexer.Connect(redisConnectionString))
     // Manually add types if you don't want to use the source generated extension method
     // Only a single QueryType can be registered. It is the entrypoint
     //.AddQueryType<BookQuery>()
